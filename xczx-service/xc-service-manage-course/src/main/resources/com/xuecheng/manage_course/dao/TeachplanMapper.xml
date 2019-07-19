@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xuecheng.manage_course.dao.TeachplanMapper">
+
+    <resultMap id="teachplanMap" type="com.xuecheng.framework.domain.course.ext.TeachplanNode">
+        <id column="one_id" property="id"></id>
+        <result column="one_pname" property="pname"></result>
+        <collection property="children" ofType="com.xuecheng.framework.domain.course.ext.TeachplanNode">
+            <id column="tow_id" property="id"></id>
+            <result column="tow_pname" property="pname"></result>
+            <collection property="children" ofType="com.xuecheng.framework.domain.course.ext.TeachplanNode">
+                <id column="three_id" property="id"></id>
+                <result column="three_pname" property="pname"></result>
+                <result column="media_id" property="mediaId"></result>
+                <result column="media_fileoriginalname" property="mediaFileoriginalname"></result>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <!--findTeachPlanList-->
+    <select id="findTeachPlanList" parameterType="java.lang.String"
+            resultMap="teachplanMap">
+        select
+        t1.`id` as `one_id`,
+        t1.`pname` as `one_pname`,
+        t2.`id` as `tow_id`,
+        t2.`pname` as `tow_pname`,
+        t3.`id` as `three_id`,
+        t3.`pname` as `three_pname`,
+        t4.`media_id` ,
+        t4.`media_fileoriginalname`
+        from
+        teachplan as t1
+        left join teachplan as t2
+        on t1.`id` = t2.`parentid`
+        LEFT JOIN teachplan as t3
+        ON t2.`id` = t3.`parentid`
+        LEFT JOIN teachplan_media AS t4
+        ON t3.`id` = t4.`teachplan_id`
+        where t1.`parentid` = '0'
+        <if test="_parameter!=null and _parameter!=''">
+            and t1.`courseid` = #{courseid}
+        </if>
+        order by t1.`orderby`,
+        t2.`orderby`,
+        t3.`orderby`
+    </select>
+</mapper>

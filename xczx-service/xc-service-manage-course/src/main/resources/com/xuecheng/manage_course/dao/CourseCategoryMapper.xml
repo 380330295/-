@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xuecheng.manage_course.dao.CourseCategoryMapper">
+
+    <resultMap id="categoryMap" type="com.xuecheng.framework.domain.course.ext.CategoryNode">
+        <id column="one_id" property="id"></id>
+        <result column="one_name" property="name"></result>
+        <collection property="children" ofType="com.xuecheng.framework.domain.course.ext.CategoryNode">
+            <id column="tow_id" property="id"></id>
+            <result column="tow_name" property="name"></result>
+            <collection property="children" ofType="com.xuecheng.framework.domain.course.ext.CategoryNode">
+                <id column="three_id" property="id"></id>
+                <result column="three_name" property="name"></result>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <select id="findCategoryList" resultMap="categoryMap" resultType="java.util.List">
+           SELECT
+              t1.`id` AS `one_id`,
+              t1.`name` AS `one_name`,
+              t2.`id` AS `tow_id`,
+              t2.`name` AS `tow_name`,
+              t3.`id` AS `three_id`,
+              t3.`name` AS `three_name`
+            FROM
+              `category` AS t1
+              LEFT JOIN `category` AS t2
+                ON t1.`id` = t2.`parentid`
+              LEFT JOIN `category` AS t3
+                ON t2.`id` = t3.`parentid`
+            WHERE
+              t1.`parentid` = '0'
+    </select>
+</mapper>
